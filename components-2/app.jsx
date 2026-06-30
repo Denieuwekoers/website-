@@ -1,13 +1,34 @@
-/* App shell — homepage 2.0 + Dagbesteding Het Kompas */
+/* App shell — homepage 2.0 + alle subpagina's, met deelbare URL per pagina */
 const App = () => {
-  const [page, setPage] = React.useState("home");
-  const [aanbodFocus, setAanbodFocus] = React.useState(null);
-  const navigate = (p, focus) => {
-    setPage(p);
-    if (p === "aanbod") setAanbodFocus(focus || null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  // pagina <-> URL-slug (hash routing, werkt op statische hosting zoals Vercel)
   const known = ["home", "kompas", "aanbod", "overons", "contact", "aanmelden", "faq", "werkenbij", "klachten", "privacy", "av"];
+
+  const readHash = () => {
+    const h = (window.location.hash || "").replace(/^#\/?/, "").split("?")[0].trim();
+    return known.includes(h) ? h : (h === "" ? "home" : "404");
+  };
+
+  const [page, setPage] = React.useState(readHash);
+  const [aanbodFocus, setAanbodFocus] = React.useState(null);
+
+  // luister naar terug/vooruit + gedeelde links
+  React.useEffect(() => {
+    const onHash = () => { setPage(readHash()); window.scrollTo({ top: 0, behavior: "auto" }); };
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  const navigate = (p, focus) => {
+    if (p === "aanbod") setAanbodFocus(focus || null);
+    const target = "#/" + (p === "home" ? "" : p);
+    if (window.location.hash !== target && !(p === "home" && (window.location.hash === "" || window.location.hash === "#"))) {
+      window.location.hash = target; // triggert hashchange -> setPage + scroll
+    } else {
+      setPage(known.includes(p) ? p : "404");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const cur = known.includes(page) ? page : "404";
   return (
     <React.Fragment>
