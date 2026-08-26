@@ -167,31 +167,38 @@ const WerkenBijPage = ({ navigate }) => {
         <div className="container">
           <div className="vacancy reveal">
             <div className="vacancy-top">
-              <span className="eyebrow">Nieuwe vacature</span>
-              <h3>Vrouwelijke coach | project Binnenboord</h3>
+              <span className="eyebrow">Stageplek</span>
+              <h3>Stagiair(e) | Time-in voorziening</h3>
               <div className="vacancy-meta">
-                <span className="vacancy-chip"><Icon name="clock" size={15} /> 3 dagen per week · 6 uur per dag</span>
-                <span className="vacancy-chip"><Icon name="pin" size={15} /> Zoetermeer</span>
+                <span className="vacancy-chip"><Icon name="clock" size={15} /> Minimaal 3 dagen per week</span>
+                <span className="vacancy-chip"><Icon name="pin" size={15} /> Motion Beweeg College, Zoetermeer</span>
                 <span className="vacancy-chip"><Icon name="users" size={15} /> Onderwijs &amp; jeugdhulp</span>
               </div>
             </div>
             <div className="vacancy-body">
-              <p>Voor <strong>Binnenboord</strong>, ons schoolbrede begeleidingsproject, zoeken we een betrokken vrouwelijke coach. Je bent een vast en zichtbaar gezicht binnen de school en begeleidt leerlingen die even vastlopen, preventief, dichtbij en gericht op groei. Je werkt met korte, praktische methodieken (van emotieregulatie tot zelfvertrouwen), signaleert vroeg en bouwt aan een veilige plek waar leerlingen weer op koers komen.</p>
+              <p>Voor onze <strong>time-in voorziening</strong> op het Motion Beweeg College in Zoetermeer zoeken we een gemotiveerde stagiair(e). De time-in is de plek waar leerlingen worden opgevangen die tijdelijk uitvallen en even niet meer kunnen meedoen in de klas. Samen met hen werken we aan één duidelijke vraag: wat is er nodig om weer mee te doen? Je ondersteunt leerlingen bij hun schoolwerk, bij plannen en organiseren, en begeleidt hen stap voor stap terug naar de klas.</p>
 
               <h4>Wat je doet</h4>
               <ul className="vacancy-list">
-                <li><span className="ck"><Icon name="check" size={13} /></span>Leerlingen individueel en in kleine groepen begeleiden</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Vroeg signaleren en samenwerken met mentoren en het schoolteam</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Werken met korte, praktische methodieken rond vaardigheden als emotieregulatie, taakaanpak en zelfvertrouwen</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Voortgang licht maar consequent bijhouden in het systeem</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Leerlingen opvangen en begeleiden binnen de time-in voorziening</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Ondersteunen bij schoolwerk, plannen en organiseren</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Meedenken over wat een leerling nodig heeft om terug te keren in de klas</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Samenwerken met mentoren, docenten en onze coaches</li>
               </ul>
 
               <h4>Wat we vragen</h4>
               <ul className="vacancy-list">
-                <li><span className="ck"><Icon name="check" size={13} /></span>Ervaring in onderwijs en/of jeugdhulp, en affiniteit met jongeren (12–18)</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Relatiegericht, rustig onder druk en duidelijk in je grenzen</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Een relevante opleiding, bij voorkeur SKJ-geregistreerd</li>
-                <li><span className="ck"><Icon name="check" size={13} /></span>Beschikbaar voor 3 dagen per week, 6 uur per dag</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Je volgt een opleiding richting onderwijs, pedagogiek, social work of jeugdhulp</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Affiniteit met jongeren (12–18) en een relatiegerichte houding</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Rustig onder druk, initiatiefrijk en duidelijk in je grenzen</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Beschikbaar voor minimaal 3 dagen per week</li>
+              </ul>
+
+              <h4>Wat je van ons krijgt</h4>
+              <ul className="vacancy-list">
+                <li><span className="ck"><Icon name="check" size={13} /></span>Intensieve begeleiding van een vaste stagebegeleider</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Veel praktijkervaring op het snijvlak van onderwijs en jeugdhulp</li>
+                <li><span className="ck"><Icon name="check" size={13} /></span>Een hecht team met korte lijnen, waarin jouw inbreng meetelt</li>
               </ul>
 
               <div className="vacancy-actions">
@@ -200,7 +207,7 @@ const WerkenBijPage = ({ navigate }) => {
               </div>
             </div>
           </div>
-          <p className="vacancy-note">Herken je jezelf hierin, maar twijfel je of je precies past? Stuur gerust een open sollicitatie — we leren mensen graag kennen.</p>
+          <p className="vacancy-note">Herken je jezelf hierin, maar twijfel je of je precies past? Stuur gerust een open sollicitatie, we leren mensen graag kennen.</p>
         </div>
       </section>
     </div>);

@@ -257,6 +257,7 @@ const Partners = () => {
   { src: "assets/partners/onc-clauslaan.png", alt: "ONC Clauslaan" },
   { src: "assets/partners/motion.png", alt: "Motion" },
   { src: "assets/partners/pijnacker-nootdorp.png", alt: "Gemeente Pijnacker-Nootdorp" },
+  { src: "assets/partners/lansingerland.png", alt: "Gemeente Lansingerland" },
   { src: "assets/partners/veurs-lyceum.png", alt: "Veurs Lyceum" }];
 
   return (
