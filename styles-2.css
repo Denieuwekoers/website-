@@ -845,6 +845,42 @@ section { padding: clamp(64px, 9vw, 112px) 0; }
 .kval p { color: var(--c-ink-soft); font-size: 15px; margin: 0; line-height: 1.55; }
 
 /* ===================================================================
+   JAARAGENDA (Het Kompas)
+   =================================================================== */
+.agenda-block { background: var(--c-paper); border: 1px solid var(--c-line); border-radius: var(--radius-xl); padding: clamp(28px, 4vw, 52px); }
+.agenda-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+.agenda-key { display: inline-flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 600; color: var(--c-ink-soft); background: var(--c-cream); border: 1px solid var(--c-line); border-radius: var(--radius-pill); padding: 7px 14px; }
+.ak { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+.ak-vak { background: var(--c-primary); }
+.ak-vrij { background: var(--c-purple-deep); }
+.ak-open { background: var(--c-yellow-deep); }
+.ak-mark { background: var(--c-green); }
+.agenda-table { border: 1px solid var(--c-line); border-radius: var(--radius); overflow: hidden; }
+.agenda-head, .agenda-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 16px; padding: 13px 18px; align-items: center; }
+.agenda-head { background: var(--c-ink); color: #fff; font-family: var(--f-display); font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.08em; }
+.agenda-row { border-top: 1px solid var(--c-line); font-size: 15px; }
+.agenda-row:nth-child(even) { background: var(--c-cream); }
+.agenda-row .ag-what { display: flex; align-items: center; gap: 11px; font-weight: 600; font-family: var(--f-display); letter-spacing: -0.01em; }
+.agenda-row .ag-date { color: var(--c-ink-soft); font-variant-numeric: tabular-nums; }
+.ag-label { display: none; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--c-mute); }
+@media (max-width: 760px) {
+  .agenda-head { display: none; }
+  .agenda-row { grid-template-columns: 1fr; gap: 6px; padding: 16px; }
+  .agenda-row .ag-what { margin-bottom: 4px; }
+  .ag-label { display: block; }
+}
+.agenda-notes { margin-top: 24px; display: grid; gap: 9px; }
+.agenda-notes p { margin: 0; padding-left: 16px; position: relative; font-size: 14.5px; color: var(--c-mute); line-height: 1.6; }
+.agenda-notes p::before { content: ""; position: absolute; left: 0; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--c-line-strong); }
+.agenda-facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 28px; padding-top: 26px; border-top: 1px solid var(--c-line); }
+@media (max-width: 860px) { .agenda-facts { grid-template-columns: 1fr; } }
+.agenda-fact { display: flex; gap: 13px; align-items: flex-start; }
+.agenda-fact .af-icon { width: 42px; height: 42px; flex-shrink: 0; border-radius: 13px; background: var(--c-primary-soft); color: var(--c-primary-dark); display: inline-flex; align-items: center; justify-content: center; }
+.agenda-fact strong { display: block; font-family: var(--f-display); font-size: 15px; margin-bottom: 3px; }
+.agenda-fact span { font-size: 14px; color: var(--c-ink-soft); line-height: 1.5; }
+.agenda-fact a { color: var(--c-primary-dark); font-weight: 600; }
+
+/* ===================================================================
    ONS AANBOD — page
    =================================================================== */
 .aanbod-hero {
@@ -1307,6 +1343,10 @@ section { padding: clamp(64px, 9vw, 112px) 0; }
 .aanmeld-form > h3 { font-size: 24px; margin-bottom: 6px; }
 .aanmeld-form .step-help { color: var(--c-mute); font-size: 15px; margin-bottom: 26px; }
 .field-group-label { font-size: 13.5px; font-weight: 700; margin-bottom: 10px; display: block; color: var(--c-ink); }
+.form-divider { display: flex; align-items: center; gap: 12px; margin: 26px 0 18px; }
+.form-divider span { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--c-mute); white-space: nowrap; }
+.form-divider em { font-style: normal; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--c-mute-soft); }
+.form-divider::after { content: ""; flex: 1; height: 1px; background: var(--c-line); }
 
 /* Choice cards */
 .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 22px; }
