@@ -63,6 +63,23 @@ const AnimatedCompass = () => {
 
 };
 
+const AGENDA = [
+  { w: "Eerste dag van het schooljaar", van: "maandag 31 augustus 2026", tot: "", t: "mark" },
+  { w: "Prinsjesdag", van: "dinsdag 15 september 2026", tot: "", t: "vrij" },
+  { w: "Herfstvakantie", van: "maandag 19 oktober 2026", tot: "vrijdag 23 oktober 2026", t: "vak" },
+  { w: "Projectweek / toetsweek", van: "maandag 14 december 2026", tot: "vrijdag 18 december 2026", t: "open" },
+  { w: "Kerstvakantie", van: "maandag 21 december 2026", tot: "vrijdag 1 januari 2027", t: "vak" },
+  { w: "Voorjaarsvakantie", van: "maandag 22 februari 2027", tot: "vrijdag 26 februari 2027", t: "vak" },
+  { w: "Suikerfeest (Eid al-Fitr)", van: "dinsdag 9 maart 2027", tot: "", t: "vrij" },
+  { w: "Goede Vrijdag", van: "vrijdag 26 maart 2027", tot: "", t: "vrij" },
+  { w: "Tweede Paasdag", van: "maandag 29 maart 2027", tot: "", t: "vrij" },
+  { w: "Projectweek / toetsweek", van: "maandag 19 april 2027", tot: "vrijdag 23 april 2027", t: "open" },
+  { w: "Meivakantie", van: "maandag 26 april 2027", tot: "vrijdag 7 mei 2027", t: "vak" },
+  { w: "Tweede Pinksterdag", van: "maandag 17 mei 2027", tot: "", t: "vrij" },
+  { w: "Projectweek / toetsweek", van: "maandag 12 juli 2027", tot: "vrijdag 16 juli 2027", t: "open" },
+  { w: "Laatste dag van het schooljaar", van: "vrijdag 16 juli 2027", tot: "", t: "mark" },
+  { w: "Zomervakantie", van: "maandag 19 juli 2027", tot: "vrijdag 27 augustus 2027", t: "vak" }];
+
 const KompasPage = ({ navigate }) => {
   useReveal();
   return (
@@ -151,6 +168,63 @@ const KompasPage = ({ navigate }) => {
                 <li><span className="ck"><Icon name="check" size={13} /></span>Trajecten van 15 weken, elke 5 weken geëvalueerd</li>
                 <li><span className="ck"><Icon name="check" size={13} /></span>Haal- en brengservice in overleg mogelijk</li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* JAARAGENDA */}
+      <section style={{ paddingTop: 0 }}>
+        <div className="container">
+          <div className="agenda-block reveal">
+            <div className="section-head section-head--left" style={{ marginBottom: 28, maxWidth: 660 }}>
+              <span className="eyebrow">Voor ouders en verzorgers</span>
+              <h2 style={{ marginTop: 16 }}>Jaaragenda 2026&ndash;2027</h2>
+              <p style={{ marginLeft: 0 }}>Wij volgen het vakantierooster van regio Midden, waar Zoetermeer onder valt. Op de vakantiedagen en feestdagen hieronder is de dagbesteding gesloten.</p>
+            </div>
+
+            <div className="agenda-legend">
+              <span className="agenda-key"><i className="ak ak-vak"></i>Vakantieweken</span>
+              <span className="agenda-key"><i className="ak ak-vrij"></i>Losse vrije dagen en feestdagen</span>
+              <span className="agenda-key"><i className="ak ak-open"></i>Project- of toetsweek, dagbesteding open</span>
+              <span className="agenda-key"><i className="ak ak-mark"></i>Start- en slotdag, dagbesteding open</span>
+            </div>
+
+            <div className="agenda-table" role="table" aria-label="Jaaragenda schooljaar 2026-2027">
+              <div className="agenda-head" role="row">
+                <span role="columnheader">Wat</span>
+                <span role="columnheader">Van</span>
+                <span role="columnheader">Tot en met</span>
+              </div>
+              {AGENDA.map((r) => (
+                <div className={`agenda-row t-${r.t}`} role="row" key={r.w + r.van}>
+                  <span className="ag-what" role="cell"><i className={`ak ak-${r.t}`}></i>{r.w}</span>
+                  <span className="ag-date" role="cell"><span className="ag-label">Van</span>{r.van}</span>
+                  <span className="ag-date" role="cell"><span className="ag-label">Tot en met</span>{r.tot || "—"}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="agenda-notes">
+              <p>Koningsdag (dinsdag 27 april), Bevrijdingsdag (woensdag 5 mei) en Hemelvaartsdag (donderdag 6 mei) vallen binnen de meivakantie.</p>
+              <p>De officiële datums voor zowel het Suikerfeest als het Offerfeest zijn nog niet bekend. Zodra deze bekend zijn, hoort u dat van ons. Op deze dagen is Het Kompas gesloten.</p>
+              <p>In de project- en toetsweken is de dagbesteding gewoon open. Uw kind werkt dan aan schoolopdrachten of toetsen.</p>
+              <p>Studiedagen van school worden later in het jaar bekend. Zodra die vaststaan, laten wij weten of de dagbesteding open is.</p>
+            </div>
+
+            <div className="agenda-facts">
+              <div className="agenda-fact">
+                <span className="af-icon"><Icon name="clock" size={20} /></span>
+                <div><strong>Openingstijden</strong><span>Maandag t/m vrijdag, 08:30&ndash;15:00 uur</span></div>
+              </div>
+              <div className="agenda-fact">
+                <span className="af-icon"><Icon name="phone" size={20} /></span>
+                <div><strong>Ziekmelden</strong><span>Vóór 08:30 uur bij de begeleider, <a href="tel:0792340902">079 234 09 02</a></span></div>
+              </div>
+              <div className="agenda-fact">
+                <span className="af-icon"><Icon name="mail" size={20} /></span>
+                <div><strong>Vragen?</strong><span><a href="mailto:info@denieuwekoers.net">info@denieuwekoers.net</a></span></div>
+              </div>
             </div>
           </div>
         </div>

@@ -6,6 +6,8 @@ const AanmeldPage = ({ navigate }) => {
     rol: "", spoor: "",
     voornaam: "", achternaam: "", leeftijd: "", postcode: "",
     contact_naam: "", email: "", telefoon: "",
+    ouder1_naam: "", ouder1_email: "", ouder1_tel: "",
+    ouder2_naam: "", ouder2_email: "", ouder2_tel: "",
     hulpvraag: "", financiering: "", urgentie: "",
   });
   const [errors, setErrors] = React.useState({});
@@ -36,6 +38,11 @@ const AanmeldPage = ({ navigate }) => {
       if (!data.contact_naam.trim()) e.contact_naam = "Naam contactpersoon";
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) e.email = "Geldig e-mailadres";
       if (!/^[\d\s+\-()]{8,}$/.test(data.telefoon)) e.telefoon = "Geldig telefoonnummer";
+      if (!data.ouder1_naam.trim()) e.ouder1_naam = "Naam gezaghebbende ouder/verzorger";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.ouder1_email)) e.ouder1_email = "Geldig e-mailadres";
+      if (!/^[\d\s+\-()]{8,}$/.test(data.ouder1_tel)) e.ouder1_tel = "Geldig telefoonnummer";
+      if (data.ouder2_email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.ouder2_email)) e.ouder2_email = "Geldig e-mailadres";
+      if (data.ouder2_tel.trim() && !/^[\d\s+\-()]{8,}$/.test(data.ouder2_tel)) e.ouder2_tel = "Geldig telefoonnummer";
     } else if (step === 3) {
       if (!data.hulpvraag.trim() || data.hulpvraag.trim().length < 20) e.hulpvraag = "Minstens 20 tekens, wat speelt er?";
       if (!data.financiering) e.financiering = "Kies een optie";
@@ -67,6 +74,12 @@ const AanmeldPage = ({ navigate }) => {
           "Naam contactpersoon": data.contact_naam,
           "E-mail": data.email,
           "Telefoon": data.telefoon,
+          "Gezaghebbende ouder/verzorger 1": data.ouder1_naam,
+          "E-mail ouder 1": data.ouder1_email,
+          "Telefoon ouder 1": data.ouder1_tel,
+          "Gezaghebbende ouder/verzorger 2": data.ouder2_naam || "—",
+          "E-mail ouder 2": data.ouder2_email || "—",
+          "Telefoon ouder 2": data.ouder2_tel || "—",
           "Hulpvraag": data.hulpvraag,
           "Financiering": LABELS.financiering[data.financiering] || data.financiering,
           "Urgentie": LABELS.urgentie[data.urgentie] || data.urgentie,
@@ -89,7 +102,7 @@ const AanmeldPage = ({ navigate }) => {
     { t: "Hulpvraag", s: "Wat speelt er?" },
   ];
 
-  const reset = () => { setDone(false); setStep(0); setData({ rol: "", spoor: "", voornaam: "", achternaam: "", leeftijd: "", postcode: "", contact_naam: "", email: "", telefoon: "", hulpvraag: "", financiering: "", urgentie: "" }); };
+  const reset = () => { setDone(false); setStep(0); setData({ rol: "", spoor: "", voornaam: "", achternaam: "", leeftijd: "", postcode: "", contact_naam: "", email: "", telefoon: "", ouder1_naam: "", ouder1_email: "", ouder1_tel: "", ouder2_naam: "", ouder2_email: "", ouder2_tel: "", hulpvraag: "", financiering: "", urgentie: "" }); };
 
   return (
     <div className="page-content">
@@ -235,6 +248,43 @@ const AanmeldPage = ({ navigate }) => {
                       <label htmlFor="am-tel">Telefoonnummer</label>
                       <input id="am-tel" type="tel" autoComplete="tel" value={data.telefoon} onChange={(e) => update("telefoon", e.target.value)} placeholder="06 12 34 56 78" />
                       {errors.telefoon && <span className="err-msg"><Icon name="spark" size={13} /> {errors.telefoon}</span>}
+                    </div>
+
+                    <div className="form-divider"><span>Gezaghebbende ouder / verzorger</span></div>
+                    <div className={`field ${errors.ouder1_naam ? "error" : ""}`}>
+                      <label htmlFor="am-o1n">Naam gezaghebbende ouder/verzorger</label>
+                      <input id="am-o1n" type="text" value={data.ouder1_naam} onChange={(e) => update("ouder1_naam", e.target.value)} placeholder="Voor- en achternaam" />
+                      {errors.ouder1_naam && <span className="err-msg"><Icon name="spark" size={13} /> {errors.ouder1_naam}</span>}
+                    </div>
+                    <div className="field-row">
+                      <div className={`field ${errors.ouder1_email ? "error" : ""}`}>
+                        <label htmlFor="am-o1e">E-mailadres</label>
+                        <input id="am-o1e" type="email" value={data.ouder1_email} onChange={(e) => update("ouder1_email", e.target.value)} placeholder="ouder@email.nl" />
+                        {errors.ouder1_email && <span className="err-msg"><Icon name="spark" size={13} /> {errors.ouder1_email}</span>}
+                      </div>
+                      <div className={`field ${errors.ouder1_tel ? "error" : ""}`}>
+                        <label htmlFor="am-o1t">Telefoonnummer</label>
+                        <input id="am-o1t" type="tel" value={data.ouder1_tel} onChange={(e) => update("ouder1_tel", e.target.value)} placeholder="06 12 34 56 78" />
+                        {errors.ouder1_tel && <span className="err-msg"><Icon name="spark" size={13} /> {errors.ouder1_tel}</span>}
+                      </div>
+                    </div>
+
+                    <div className="form-divider"><span>Tweede gezaghebbende ouder / verzorger <em>(optioneel)</em></span></div>
+                    <div className="field">
+                      <label htmlFor="am-o2n">Naam</label>
+                      <input id="am-o2n" type="text" value={data.ouder2_naam} onChange={(e) => update("ouder2_naam", e.target.value)} placeholder="Voor- en achternaam" />
+                    </div>
+                    <div className="field-row">
+                      <div className={`field ${errors.ouder2_email ? "error" : ""}`}>
+                        <label htmlFor="am-o2e">E-mailadres</label>
+                        <input id="am-o2e" type="email" value={data.ouder2_email} onChange={(e) => update("ouder2_email", e.target.value)} placeholder="ouder@email.nl" />
+                        {errors.ouder2_email && <span className="err-msg"><Icon name="spark" size={13} /> {errors.ouder2_email}</span>}
+                      </div>
+                      <div className={`field ${errors.ouder2_tel ? "error" : ""}`}>
+                        <label htmlFor="am-o2t">Telefoonnummer</label>
+                        <input id="am-o2t" type="tel" value={data.ouder2_tel} onChange={(e) => update("ouder2_tel", e.target.value)} placeholder="06 12 34 56 78" />
+                        {errors.ouder2_tel && <span className="err-msg"><Icon name="spark" size={13} /> {errors.ouder2_tel}</span>}
+                      </div>
                     </div>
                   </React.Fragment>
                 )}
