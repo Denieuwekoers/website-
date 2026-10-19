@@ -1490,3 +1490,46 @@ section { padding: clamp(64px, 9vw, 112px) 0; }
 .nf-wrap h1 { margin: 16px 0 14px; }
 .nf-wrap p { font-size: 18px; color: var(--c-mute); margin-bottom: 30px; }
 .nf-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== Klachten ===== */
+.kl-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;max-width:960px;margin:0 auto}
+@media (max-width:760px){.kl-quick{grid-template-columns:1fr}}
+.kl-quick-item{display:flex;align-items:center;gap:14px;text-align:left;padding:18px 20px;min-height:72px;background:var(--c-paper);border:1px solid var(--c-line);border-radius:var(--radius);box-shadow:var(--shadow-xs);color:var(--c-ink);transition:border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.kl-quick-item:hover{border-color:var(--c-primary-deep);box-shadow:var(--shadow-sm);transform:translateY(-2px)}
+.kl-quick-item strong{display:block;font-family:var(--f-display);font-size:16px}
+.kl-quick-item small{display:block;font-size:13.5px;color:var(--c-mute)}
+.kl-qi-icon{width:44px;height:44px;flex-shrink:0;border-radius:13px;background:var(--c-primary-soft);color:var(--c-primary-dark);display:inline-flex;align-items:center;justify-content:center}
+.kl-ladder{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:1000px;margin:0 auto}
+@media (max-width:760px){.kl-ladder{grid-template-columns:1fr}}
+.kl-step{display:flex;gap:16px;align-items:flex-start;padding:24px;background:var(--c-paper);border:1px solid var(--c-line);border-radius:var(--radius-lg)}
+.kl-num{width:40px;height:40px;flex-shrink:0;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--f-display);font-weight:800;font-size:17px;color:#fff}
+.kl-step.tone-mint .kl-num{background:var(--c-primary-deep)}
+.kl-step.tone-purple .kl-num{background:var(--c-purple-deep)}
+.kl-step.tone-yellow .kl-num{background:var(--c-yellow-deep)}
+.kl-step.tone-coral .kl-num{background:var(--c-coral)}
+.kl-tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--c-mute);margin-bottom:4px}
+.kl-step h3{font-size:19px;margin-bottom:8px}
+.kl-step p{color:var(--c-ink-soft);font-size:15px;line-height:1.6;margin:0}
+.kl-step a,.kl-box a{color:var(--c-primary-dark);font-weight:600}
+.kl-step a:hover,.kl-box a:hover{text-decoration:underline}
+.kl-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:24px;align-items:start;max-width:1100px;margin:0 auto}
+@media (max-width:900px){.kl-grid{grid-template-columns:1fr}}
+.kl-form .choice-grid{margin-bottom:20px}
+.kl-form .field select{width:100%}
+.kl-hint{font-size:13.5px;color:var(--c-mute);margin:-6px 0 16px}
+.kl-aside{display:flex;flex-direction:column;gap:16px}
+.kl-box{background:var(--c-paper);border:1px solid var(--c-line);border-radius:var(--radius-lg);padding:26px}
+.kl-box h3{font-size:19px;margin:14px 0 8px}
+.kl-box p{color:var(--c-ink-soft);font-size:15px;line-height:1.6;margin:0 0 12px}
+.kl-box .eyebrow{margin-bottom:4px}
+.kl-contact{font-weight:600}
+.kl-list{list-style:none;display:grid;gap:12px;margin-top:14px}
+.kl-list li{display:flex;gap:12px;align-items:flex-start;font-size:15px;line-height:1.5;color:var(--c-ink-soft)}
+.kl-list .ck{width:22px;height:22px;flex-shrink:0;margin-top:1px;border-radius:50%;background:var(--c-ink);color:var(--c-primary);display:inline-flex;align-items:center;justify-content:center}
+
+.kl-follow{list-style:none;display:grid;gap:14px;margin-top:6px;position:relative}
+.kl-follow li{display:flex;gap:12px;align-items:flex-start;position:relative}
+.kl-follow li:not(:last-child)::after{content:"";position:absolute;left:13px;top:30px;bottom:-12px;width:2px;background:var(--c-line)}
+.kl-fnum{width:28px;height:28px;flex-shrink:0;border-radius:50%;background:var(--c-primary-soft);color:var(--c-primary-dark);font-family:var(--f-display);font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.kl-follow strong{display:block;font-family:var(--f-display);font-size:15px;margin-bottom:2px}
+.kl-follow p{font-size:14.5px;line-height:1.55;margin:0;color:var(--c-ink-soft)}
