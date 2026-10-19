@@ -110,7 +110,7 @@ const AanmeldPage = ({ navigate }) => {
       <section className="aanmeld-hero" style={{ padding: 0 }}>
         <div className="container" style={{ padding: "clamp(40px,6vw,72px) 24px clamp(36px,5vw,56px)" }}>
           <nav className="breadcrumb" aria-label="Kruimelpad">
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
+            <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
             <span aria-hidden="true">›</span>
             <span>Aanmelden</span>
           </nav>

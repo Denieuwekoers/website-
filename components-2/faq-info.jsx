@@ -3,6 +3,7 @@
 const FAQ_ITEMS = [
 { cat: "Algemeen", q: "Wat is De Nieuwe Koers?", a: "We begeleiden jongeren tussen 12 en 23 met specifieke ondersteuningsbehoeften, op school, thuis en in hun persoonlijke ontwikkeling. Denk aan dagbesteding, individuele begeleiding, intercoaching, trainingen en screenende diagnostiek." },
 { cat: "Algemeen", q: "Voor wie zijn jullie diensten bedoeld?", a: "Voor jongeren van 12 tot 23 jaar die te maken hebben met schooluitval, milde verstandelijke beperking (LVB), autisme, ADHD of gedragsproblematiek. Twijfel? Bel of mail ons gerust, we denken mee." },
+{ cat: "Algemeen", q: "Ik ben ergens niet tevreden over. Wat kan ik doen?", a: <>Laat het ons weten, hoe eerder hoe beter. Je kunt het bespreken met je begeleider, een melding doen via ons klachtenformulier, of direct contact opnemen met de onafhankelijke klachtenfunctionaris van Erisietsmisgegaan. Alle stappen vind je op onze pagina <a href="klachten">Klacht melden</a>.</> },
 { cat: "Aanmelden", q: "Hoe meld ik een jongere aan?", a: "Aanmelden kan via het formulier op deze site, per e-mail of telefonisch. We nemen binnen 2 werkdagen contact op om de specifieke behoeften te bespreken." },
 { cat: "Aanmelden", q: "Hoe snel kan een traject starten?", a: "Meestal binnen 2 weken na aanmelding. Bij urgente situaties kijken we altijd of het sneller kan." },
 { cat: "Aanbod", q: "Welke groepstrainingen bieden jullie aan?", a: "Sociale vaardigheidstraining, emotieregulatie, zelfvertrouwenstraining en trainingen gericht op executieve functies. Daarnaast ontwikkelen we trainingen op maat voor scholen en groepen." },
@@ -51,7 +52,7 @@ const FaqPage = ({ navigate }) => {
       <section className="faq-hero" style={{ padding: 0 }}>
         <div className="container" style={{ padding: "clamp(40px,6vw,72px) 24px clamp(36px,5vw,56px)" }}>
           <nav className="breadcrumb" aria-label="Kruimelpad">
-            <a href="#" onClick={(e) => {e.preventDefault();navigate("home");}}>Home</a>
+            <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
             <span aria-hidden="true">›</span>
             <span>FAQ</span>
           </nav>
@@ -97,7 +98,7 @@ const InfoHero = ({ crumb, eyebrow, title, lead, navigate }) =>
 <section className="info-hero" style={{ padding: 0 }}>
     <div className="container" style={{ padding: "clamp(40px,6vw,72px) 24px clamp(32px,4vw,48px)" }}>
       <nav className="breadcrumb" aria-label="Kruimelpad">
-        <a href="#" onClick={(e) => {e.preventDefault();navigate("home");}}>Home</a>
+        <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
         <span aria-hidden="true">›</span>
         <span>{crumb}</span>
       </nav>
@@ -149,7 +150,7 @@ const WerkenBijPage = ({ navigate }) => {
           <div className="werkenbij-hero-grid">
             <div>
               <nav className="breadcrumb" aria-label="Kruimelpad">
-                <a href="#" onClick={(e) => {e.preventDefault();navigate("home");}}>Home</a>
+                <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
                 <span aria-hidden="true">›</span>
                 <span>Werken bij</span>
               </nav>

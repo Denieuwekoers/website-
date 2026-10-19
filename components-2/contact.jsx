@@ -63,7 +63,7 @@ const ContactPage = ({ navigate }) => {
       <section className="contact-hero" style={{ padding: 0 }}>
         <div className="container" style={{ padding: "clamp(40px,6vw,72px) 24px clamp(36px,5vw,56px)" }}>
           <nav className="breadcrumb" aria-label="Kruimelpad">
-            <a href="#" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
+            <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
             <span aria-hidden="true">›</span>
             <span>Contact</span>
           </nav>
@@ -98,6 +98,7 @@ const ContactPage = ({ navigate }) => {
                 <div className="ch-row"><span>Maandag t/m vrijdag</span><span className="open">09:00 tot 17:00</span></div>
                 <div className="ch-row"><span>Weekend</span><span style={{ color: "rgba(255,255,255,0.6)" }}>Op afspraak</span></div>
               </div>
+              <p className="contact-klacht">Niet tevreden over onze begeleiding? <a href="klachten" onClick={(e) => { e.preventDefault(); navigate("klachten"); }}>Lees hoe je een klacht meldt</a>.</p>
             </div>
 
             {/* Form card */}

@@ -1533,3 +1533,8 @@ section { padding: clamp(64px, 9vw, 112px) 0; }
 .kl-fnum{width:28px;height:28px;flex-shrink:0;border-radius:50%;background:var(--c-primary-soft);color:var(--c-primary-dark);font-family:var(--f-display);font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;justify-content:center;position:relative;z-index:1}
 .kl-follow strong{display:block;font-family:var(--f-display);font-size:15px;margin-bottom:2px}
 .kl-follow p{font-size:14.5px;line-height:1.55;margin:0;color:var(--c-ink-soft)}
+
+.kl-privacy{font-size:13.5px;line-height:1.55;color:var(--c-mute);margin:0 0 16px}
+.kl-privacy a,.faq-a a,.contact-klacht a{color:var(--c-primary-dark);font-weight:600;text-decoration:underline}
+.contact-klacht{position:relative;z-index:1;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.1);font-size:14.5px;color:rgba(255,255,255,0.75)}
+.contact-klacht a{color:var(--c-primary)}

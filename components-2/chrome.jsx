@@ -39,7 +39,10 @@ const Header = ({ navigate, page = "home" }) => {
       { id: "werkenbij", label: "Werken bij" },
     ] },
     { id: "faq", label: "FAQ" },
-    { id: "contact", label: "Contact" },
+    { id: "contact", label: "Contact", children: [
+      { id: "contact", label: "Contact" },
+      { id: "klachten", label: "Klacht melden" },
+    ] },
   ];
   return (
     <header className="site-header">
@@ -106,19 +109,20 @@ const Footer = ({ navigate }) => (
         <div className="footer-col">
           <h5>Aanbod</h5>
           <ul>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("kompas"); }}>Dagbesteding Het Kompas</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Ambulante &amp; gezinsbegeleiding</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Jeugdhulp &amp; onderwijs</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Trainingen &amp; diagnostiek</a></li>
+            <li><a href="kompas" onClick={(e) => { e.preventDefault(); navigate("kompas"); }}>Dagbesteding Het Kompas</a></li>
+            <li><a href="aanbod" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Ambulante &amp; gezinsbegeleiding</a></li>
+            <li><a href="aanbod" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Jeugdhulp &amp; onderwijs</a></li>
+            <li><a href="aanbod" onClick={(e) => { e.preventDefault(); navigate("aanbod"); }}>Trainingen &amp; diagnostiek</a></li>
           </ul>
         </div>
         <div className="footer-col">
           <h5>Organisatie</h5>
           <ul>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("overons"); }}>Over ons &amp; team</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("werkenbij"); }}>Werken bij</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("faq"); }}>Veelgestelde vragen</a></li>
-            <li><a href="#" onClick={(e) => { e.preventDefault(); navigate("contact"); }}>Contact</a></li>
+            <li><a href="overons" onClick={(e) => { e.preventDefault(); navigate("overons"); }}>Over ons &amp; team</a></li>
+            <li><a href="werkenbij" onClick={(e) => { e.preventDefault(); navigate("werkenbij"); }}>Werken bij</a></li>
+            <li><a href="faq" onClick={(e) => { e.preventDefault(); navigate("faq"); }}>Veelgestelde vragen</a></li>
+            <li><a href="contact" onClick={(e) => { e.preventDefault(); navigate("contact"); }}>Contact</a></li>
+            <li><a href="klachten" onClick={(e) => { e.preventDefault(); navigate("klachten"); }}>Klacht melden</a></li>
           </ul>
         </div>
         <div className="footer-col">
@@ -138,9 +142,9 @@ const Footer = ({ navigate }) => (
       <div className="footer-bottom">
         <span>© 2026 De Nieuwe Koers B.V., KvK 96172630, AGB-code 78780874, SKJ-geregistreerd</span>
         <div className="footer-legal">
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate("privacy"); }}>Privacy</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate("av"); }}>Voorwaarden</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); navigate("klachten"); }}>Klacht melden</a>
+          <a href="privacy" onClick={(e) => { e.preventDefault(); navigate("privacy"); }}>Privacy</a>
+          <a href="av" onClick={(e) => { e.preventDefault(); navigate("av"); }}>Voorwaarden</a>
+          <a href="klachten" onClick={(e) => { e.preventDefault(); navigate("klachten"); }}>Klacht melden</a>
         </div>
         <div className="footer-keurmerken">
           <span className="keurmerk">SKJ</span>

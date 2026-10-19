@@ -6,7 +6,7 @@ const KL_STEPS = [
   { n: "1", tag: "Informeel", tone: "mint", t: "Bespreek het", d: "Vertel je begeleider of de teamcoördinator wat er speelt. Vaak is een goed gesprek genoeg. Liever niet met je eigen begeleider? Dan kan het ook met iemand anders uit het team." },
   { n: "2", tag: "Formeel", tone: "purple", t: "Meld het bij ons", d: "Vul het formulier hieronder in, mail ons of bel. Binnen 5 werkdagen nemen we contact met je op. Binnen 6 weken ontvang je een schriftelijke reactie van de directie." },
   { n: "3", tag: "Onafhankelijk", tone: "yellow", t: "Klachtenfunctionaris", d: <>Kom je er met ons niet uit, of praat je liever meteen met iemand buiten De Nieuwe Koers? De klachtenfunctionaris van <a href="https://erisietsmisgegaan.nl" target="_blank" rel="noopener noreferrer">Erisietsmisgegaan</a> denkt gratis en onafhankelijk met je mee. Bel <a href="tel:0352031585">035 203 1585</a> of mail <a href="mailto:info@erisietsmisgegaan.nl">info@erisietsmisgegaan.nl</a>.</> },
-  { n: "4", tag: "Onafhankelijk oordeel", tone: "coral", t: "Klachten- of geschillencommissie", d: <>Is je klacht daarna nog niet opgelost? Dan kun je hem voorleggen aan de Klachtencommissie Jeugdwet of de Geschillencommissie van <a href="https://erisietsmisgegaan.nl" target="_blank" rel="noopener noreferrer">Erisietsmisgegaan</a>. Zij geven een onafhankelijk oordeel.</> },
+  { n: "4", tag: "Onafhankelijk oordeel", tone: "coral", t: "Klachten- of geschillencommissie", d: <>Is je klacht daarna nog niet opgelost? Dan kun je hem voorleggen aan de Klachtencommissie Jeugdwet of de Geschillencommissie van <a href="https://erisietsmisgegaan.nl" target="_blank" rel="noopener noreferrer">Erisietsmisgegaan</a>. Zij geven een onafhankelijk oordeel. Krijg je ondersteuning vanuit de Wmo? Dan kun je terecht bij de Geschillencommissie van Erisietsmisgegaan.</> },
 ];
 
 const KlachtForm = () => {
@@ -117,6 +117,7 @@ const KlachtForm = () => {
         <textarea id="kl-wens" rows="2" value={f.wens} onChange={(e) => set("wens", e.target.value)} />
       </div>
 
+      <p className="kl-privacy">We gebruiken je gegevens alleen om je melding te behandelen en contact met je op te nemen. We delen ze niet zonder jouw toestemming. Lees meer in onze <a href="privacy">privacyverklaring</a>.</p>
       {submitError && <p className="err-msg" role="alert">{submitError}</p>}
       <button type="submit" className="btn btn-primary btn-lg btn-arrow" disabled={sending}>
         {sending ? "Bezig met verzenden…" : formeel ? "Klacht indienen" : "Melding versturen"} {!sending && <Icon name="arrow" size={18} />}

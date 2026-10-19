@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://denieuwekoers.net/sitemap.xml

@@ -195,7 +195,7 @@ const AanbodPage = ({ navigate, initialActive }) => {
           <div className="aanbod-hero-grid">
             <div>
               <nav className="breadcrumb" aria-label="Kruimelpad">
-                <a href="#" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
+                <a href="./" onClick={(e) => { e.preventDefault(); navigate("home"); }}>Home</a>
                 <span aria-hidden="true">›</span>
                 <span>Ons aanbod</span>
               </nav>
