@@ -214,40 +214,6 @@ const WerkenBijPage = ({ navigate }) => {
 
 };
 
-/* ===== Klachten ===== */
-const KlachtenPage = ({ navigate }) => {
-  useReveal();
-  const steps = [
-  { n: "1", t: "Praat met je begeleider", d: "De snelste route is meestal direct: vertel je begeleider wat er speelt. Negen van de tien keer komen we er samen uit." },
-  { n: "2", t: "Klacht bij de directie", d: <>Lukt dat niet, of past dat niet? Dien een formele klacht in bij de directie via <a href="mailto:klacht@denieuwekoers.net">klacht@denieuwekoers.net</a>. Je krijgt binnen 5 werkdagen een reactie.</> },
-  { n: "3", t: "Onafhankelijke klachtenregeling", d: <>Komen we er nog niet uit, dan kun je je klacht voorleggen aan onze onafhankelijke klachtenpartij <strong>Erisietsmisgegaan.nl</strong>. Je vindt de procedure op <a href="https://erisietsmisgegaan.nl" target="_blank" rel="noopener noreferrer">erisietsmisgegaan.nl</a>.</> }];
-
-  return (
-    <div className="page-content">
-      <InfoHero navigate={navigate} crumb="Klacht melden" eyebrow="Klachten"
-      title="Loopt er iets niet zoals het hoort?"
-      lead="Vertel het ons. We nemen klachten serieus, niet omdat het moet, maar omdat we beter willen worden van wat misgaat." />
-      <section>
-        <div className="container">
-          <div className="legal-content reveal">
-            {steps.map((s) =>
-            <div key={s.n} className="legal-block legal-step">
-                <span className="ls-num">{s.n}</span>
-                <h3>{s.t}</h3>
-                <p>{s.d}</p>
-              </div>
-            )}
-            <div className="legal-block">
-              <h3>Vertrouwenspersoon</h3>
-              <p>Liever eerst sparren met iemand buiten onze organisatie? Het AKJ (Advies- en Klachtenbureau Jeugdzorg) heeft vertrouwenspersonen die gratis met je meedenken: <strong>088-555 1000</strong>.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>);
-
-};
-
 /* ===== Privacy ===== */
 const PrivacyPage = ({ navigate }) => {
   useReveal();
@@ -327,4 +293,4 @@ const NotFoundPage = ({ navigate }) =>
   </div>;
 
 
-Object.assign(window, { FAQ_ITEMS, FaqSection, FaqPage, WerkenBijPage, KlachtenPage, PrivacyPage, AVPage, NotFoundPage });
+Object.assign(window, { FAQ_ITEMS, FaqSection, FaqPage, WerkenBijPage, PrivacyPage, AVPage, NotFoundPage });
