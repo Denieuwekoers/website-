@@ -137,6 +137,10 @@ const Footer = ({ navigate }) => (
             <img src="assets/hkz-kleine-organisaties.jpg" alt="HKZ Kleine Organisaties gecertificeerd" />
             <span>HKZ Kleine Organisaties<br />gecertificeerd</span>
           </div>
+          <a className="footer-cert" href="https://www.s-bb.nl" target="_blank" rel="noopener noreferrer">
+            <img src="assets/sbb-erkend-leerbedrijf.jpg" alt="Erkend leerbedrijf, SBB" />
+            <span>Erkend leerbedrijf<br />SBB</span>
+          </a>
         </div>
       </div>
       <div className="footer-bottom">
@@ -150,6 +154,7 @@ const Footer = ({ navigate }) => (
           <span className="keurmerk">SKJ</span>
           <span className="keurmerk">NIP</span>
           <span className="keurmerk">HKZ</span>
+          <span className="keurmerk">SBB</span>
         </div>
       </div>
     </div>

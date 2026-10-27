@@ -67,6 +67,7 @@ const OverOnsPage = ({ navigate }) => {
                 <div className="over-cred">
                   <span className="cred"><Icon name="shield" size={16} /> SKJ-geregistreerd</span>
                   <span className="cred"><Icon name="check" size={16} /> HKZ-gecertificeerd</span>
+                  <span className="cred"><Icon name="check" size={16} /> Erkend leerbedrijf</span>
                   <span className="cred"><Icon name="pin" size={16} /> Zoetermeer &amp; Haaglanden</span>
                 </div>
               </div>

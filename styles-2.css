@@ -724,6 +724,9 @@ section { padding: clamp(64px, 9vw, 112px) 0; }
 .footer-cert { display: flex; align-items: center; gap: 12px; margin-top: 22px; }
 .footer-cert img { width: 58px; height: auto; border-radius: 8px; background: #fff; padding: 4px; flex-shrink: 0; }
 .footer-cert span { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,0.78); line-height: 1.35; }
+.footer-cert + .footer-cert { margin-top: 12px; }
+a.footer-cert { text-decoration: none; }
+a.footer-cert:hover span { color: #fff; }
 .keurmerk { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; padding: 5px 11px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.75); }
 
 /* ============= Reveal (CSS-only load animation — cannot get stuck) ============= */
