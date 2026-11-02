@@ -131,7 +131,7 @@ async function api(actie, body = null, opties = {}) {
     if (antwoord && typeof antwoord.token === "string" && (antwoord.token || actie === "uitloggen")) zetToken(antwoord.token);
     if (r.status === 401) zetToken("");
     if (r.status === 401 && !opties.stil) {
-        S.rol = null; S.ik = null; S.scherm = "login";
+        S.rol = null; S.ik = null; S.scherm = "login"; BEHEER = { lijst: null, mij: null, laden: false, fout: "" };
         for (const c of Object.keys(data)) data[c] = {};
         teken();
         throw new Error(antwoord?.fout || "Je bent uitgelogd. Log opnieuw in.");
@@ -776,6 +776,70 @@ function tekenAdminScholen() {
     </table></div>`;
 }
 
+/* ------------------------------------------------- beheerders en wachtwoord */
+let BEHEER = { lijst: null, mij: null, laden: false, fout: "" };
+async function laadBeheerders() {
+    if (BEHEER.laden) return;
+    BEHEER.laden = true;
+    try { const r = await api("beheerders", {}); BEHEER = { lijst: r.beheerders || [], mij: r.mij, laden: false, fout: "" }; }
+    catch (e) { BEHEER = { ...BEHEER, laden: false, fout: e.message || "De beheerders konden niet worden geladen." }; }
+    if (S.scherm === "admin-beheerders") teken();
+}
+
+async function verversBeheerders() {
+    BEHEER = { lijst: BEHEER.lijst, mij: BEHEER.mij, laden: false, fout: "" };
+    await laadBeheerders();
+}
+
+function tekenAdminBeheerders() {
+    if (BEHEER.lijst === null && !BEHEER.laden && !BEHEER.fout) setTimeout(laadBeheerders, 0);
+    const lijstHtml = BEHEER.fout ? `<div class="melding fout">${esc(BEHEER.fout)}</div>`
+        : BEHEER.lijst === null ? `<p class="zacht">Even laden…</p>`
+        : `<div class="tabel-omhulsel"><table class="tabel">
+      <thead><tr><th>Naam</th><th>E-mailadres</th><th>Sinds</th><th></th></tr></thead>
+      <tbody>
+        ${BEHEER.lijst.map(b => `<tr>
+          <td><strong>${esc(b.naam)}</strong>${b.id === BEHEER.mij ? ` <span class="mini">(jij)</span>` : ""}</td>
+          <td>${esc(b.email)}</td>
+          <td>${esc(datumKort(b.aangemaakt))}</td>
+          <td>${b.id !== BEHEER.mij && BEHEER.lijst.length > 1
+              ? `<button class="knop klein gevaar" data-actie="beheerder-weg" data-id="${esc(b.id)}" data-naam="${esc(b.naam)}">Verwijderen</button>` : ""}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table></div>`;
+    return `
+    <div class="kop"><div>
+      <h1>Beheerders</h1>
+      <p class="zacht">Alleen mensen op deze lijst kunnen inloggen bij Beheer.</p>
+    </div></div>
+    <details class="uitklap">
+      <summary>+ Collega toevoegen</summary>
+      <form class="formulier" data-form="beheerder-nieuw" autocomplete="off">
+        <div class="rij">
+          <label>Naam<input type="text" name="naam" required maxlength="120" placeholder="Voor- en achternaam"></label>
+          <label>E-mailadres<input type="email" name="email" required maxlength="150" placeholder="naam@denieuwekoers.net"></label>
+        </div>
+        <label>Tijdelijk wachtwoord (minstens 12 tekens)
+          <input type="text" name="wachtwoord" required minlength="12" autocomplete="new-password" spellcheck="false">
+        </label>
+        <p class="mini">Geef dit wachtwoord persoonlijk door. Je collega kan het daarna zelf wijzigen op deze pagina.</p>
+        <div><button class="knop" type="submit">Account aanmaken</button></div>
+      </form>
+    </details>
+    ${lijstHtml}
+    <details class="uitklap" style="margin-top:1.2rem">
+      <summary>Mijn wachtwoord wijzigen</summary>
+      <form class="formulier" data-form="wachtwoord">
+        <label>Huidig wachtwoord<input type="password" name="huidig" required autocomplete="current-password"></label>
+        <div class="rij">
+          <label>Nieuw wachtwoord (minstens 12 tekens)<input type="password" name="nieuw" required minlength="12" autocomplete="new-password"></label>
+          <label>Herhaal nieuw wachtwoord<input type="password" name="herhaal" required minlength="12" autocomplete="new-password"></label>
+        </div>
+        <div><button class="knop" type="submit">Wachtwoord opslaan</button></div>
+      </form>
+    </details>`;
+}
+
 function tekenAdminVakken() {
     const scholen = lijst("scholen").sort((a, b) => a.naam.localeCompare(b.naam));
     if (!scholen.length) {
@@ -933,7 +997,7 @@ function balk() {
         docent: [["docent-dashboard", "Leerlingen"]],
         leerling: [["leerling-dashboard", "Mijn opdrachten"]],
         admin: [["admin-dashboard", "Overzicht"], ["admin-agenda", "Weekagenda"], ["admin-opdrachten", "Opdrachten"],
-                ["admin-leerlingen", "Leerlingen"], ["admin-scholen", "Scholen"], ["admin-vakken", "Vakken"]],
+                ["admin-leerlingen", "Leerlingen"], ["admin-scholen", "Scholen"], ["admin-vakken", "Vakken"], ["admin-beheerders", "Beheerders"]],
     }[S.rol];
     return `
     <header class="balk">
@@ -964,6 +1028,7 @@ function inhoud() {
         case "admin-vakken":     return tekenAdminVakken();
         case "admin-leerlingen": return tekenAdminLeerlingen();
         case "admin-opdrachten": return tekenAdminOpdrachten();
+        case "admin-beheerders": return tekenAdminBeheerders();
         default: return tekenDocentDashboard();
     }
 }
@@ -1012,12 +1077,18 @@ document.addEventListener("click", (ev) => {
     switch (t.dataset.actie) {
         case "uitloggen":
             api("uitloggen", {}).catch(() => {}).finally(() => {
-                S.rol = null; S.ik = null; S.scherm = "login"; S.tab = "leerling";
+                S.rol = null; S.ik = null; S.scherm = "login"; S.tab = "leerling"; BEHEER = { lijst: null, mij: null, laden: false, fout: "" };
                 for (const c of Object.keys(data)) data[c] = {};
                 teken();
             });
             break;
         case "bijlage-open": bijlageOpenen(id); break;
+        case "beheerder-weg": {
+            if (!confirm(`Account van ${t.dataset.naam || "deze beheerder"} verwijderen? Deze persoon kan daarna niet meer inloggen.`)) break;
+            api("beheerder_weg", { id }).then(async r => { await verversBeheerders(); melden(r.melding || "Account verwijderd."); })
+                .catch(e => melden(e.message, "fout"));
+            break;
+        }
         case "bijlage-weg": wis("bijlagen", id).then(() => melden("Bijlage verwijderd.")); break;
         case "opdracht-weg": verwijderOpdracht(id); break;
         case "opdracht-wissel": {
@@ -1264,6 +1335,19 @@ document.addEventListener("submit", async (ev) => {
                 tekst, aangemaakt: new Date().toISOString(),
             });
             melden("Opmerking geplaatst.");
+            break;
+        }
+        case "beheerder-nieuw": {
+            try {
+                const r = await api("beheerder_nieuw", { naam: String(v.naam).trim(), email: String(v.email).trim(), wachtwoord: String(v.wachtwoord) });
+                await verversBeheerders(); melden(r.melding || "Account aangemaakt.");
+            } catch (e) { melden(e.message, "fout"); }
+            break;
+        }
+        case "wachtwoord": {
+            if (String(v.nieuw) !== String(v.herhaal)) { melden("De twee nieuwe wachtwoorden zijn niet hetzelfde.", "fout"); break; }
+            try { const r = await api("wachtwoord", { huidig: String(v.huidig), nieuw: String(v.nieuw), herhaal: String(v.herhaal) }); melden(r.melding || "Je wachtwoord is gewijzigd."); }
+            catch (e) { melden(e.message, "fout"); }
             break;
         }
         case "school-nieuw": {
