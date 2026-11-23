@@ -27,8 +27,7 @@ const OverOnsPage = ({ navigate }) => {
 
   const team = [
   { initials: "MA", photo: null, n: "Mohammed Amin Al Hashime", r: "Gedragswetenschapper & mede-oprichter", tone: "mint", b: "Verbindt wetenschap met de praktijk van alledag. Geen theorie zonder toepassing." },
-  { initials: "MM", photo: null, n: "Marwan Moradi", r: "Beleidscoördinator & mede-oprichter", tone: "yellow", b: "Zorgt dat alles klopt, voor jongeren, verwijzers én gemeenten." },
-  { initials: "AC", photo: null, n: "Abdellah Chouaibi", r: "Teamcoördinator & mede-oprichter", tone: "purple", b: "Houdt het team scherp en de lijnen kort. Altijd bereikbaar, altijd betrokken." }];
+  { initials: "MM", photo: null, n: "Marwan Moradi", r: "Beleidscoördinator & mede-oprichter", tone: "yellow", b: "Zorgt dat alles klopt, voor jongeren, verwijzers én gemeenten." }];
 
   const staff = [
   { initials: "MF", n: "Mohammed Faloun", r: "SKJ-geregistreerd begeleider", tone: "mint", b: "Al 6 jaar actief in de jeugdhulpverlening; begeleidt jongeren ambulant en coacht op scholen." },
@@ -37,7 +36,7 @@ const OverOnsPage = ({ navigate }) => {
   { initials: "ML", n: "Mourad Loukili", r: "Huiswerkbegeleider", tone: "mint", b: "Geeft huiswerkbegeleiding op locatie." }];
 
   const story = [
-  { y: "2020", t: "De basis", d: "Mohammed Amin, Marwan en Abdellah starten elk afzonderlijk in de jeugdhulpverlening en het onderwijs. Drie mensen, één overtuiging: het kan anders." },
+  { y: "2020", t: "De basis", d: "Mohammed Amin en Marwan starten elk afzonderlijk in de jeugdhulpverlening en het onderwijs. Verschillende wegen, één overtuiging: het kan anders." },
   { y: "2025", t: "De start", d: "De Nieuwe Koers is een feit. Met drie jongeren op de groep 'Het Kompas', veel ambitie en een aanpak die meetbaar maakt wat anderen alleen beschrijven." },
   { y: "2026", t: "HKZ-gecertificeerd & eigen software", d: "Kiwa kent ons het HKZ-certificaat toe, een bevestiging van de kwaliteit die we dagelijks nastreven. In hetzelfde jaar ontwikkelen we onze eigen software en passen die toe in de praktijk, zodat voortgang zichtbaar en meetbaar wordt." },
   { y: "Vandaag", t: "Groeiende koers", d: "Een hecht team, vijf sporen, samenwerking met meerdere scholen in Haaglanden en gemeente Pijnacker-Nootdorp, en elke dag nieuwe jongeren die weer perspectief ervaren." }];
