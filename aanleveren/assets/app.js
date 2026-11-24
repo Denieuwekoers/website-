@@ -67,6 +67,14 @@ function volgendeWeek(week, jaar) {
     return week >= wekenInJaar(jaar) ? { week: 1, jaar: jaar + 1 } : { week: week + 1, jaar };
 }
 /** Alle weken van 'van' t/m 'tot', met jaarwissel. */
+/** Bij welk jaar hoort dit weeknummer? Een week die al ruim voorbij is, valt in het volgende jaar. */
+function jaarVoorWeek(week) {
+    week = Number(week);
+    if (week < NU.week - 8) return NU.jaar + 1;
+    if (week > NU.week + 44) return NU.jaar - 1;
+    return NU.jaar;
+}
+
 function wekenReeks(van, tot, jaar, max = 26) {
     const reeks = [{ week: van, jaar }];
     if (!tot || tot === van) return reeks;
@@ -152,6 +160,33 @@ async function laadStaat() {
     }
 }
 
+/* Werk van collega's verschijnt vanzelf: elke 30 seconden, en zodra het tabblad weer in beeld komt.
+   Niet tijdens het invullen van een formulier, zodat er niets wegvalt. */
+async function verversStil() {
+    if (!S.rol || document.hidden) return;
+    const a = document.activeElement;
+    if (["docent-nieuw", "docent-bewerk"].includes(S.scherm)) return;
+    if (a && a.closest && a.closest("form") && ["INPUT", "TEXTAREA", "SELECT"].includes(a.tagName)) return;
+    const ingevuld = [...document.querySelectorAll("form input[type=text], form textarea")].some(x => x.value !== x.defaultValue);
+    if (ingevuld) return;
+    try {
+        const open = [...document.querySelectorAll("details[open] > summary")].map(x => x.textContent.trim());
+        const y = window.scrollY;
+        await laadStaat(); teken();
+        document.querySelectorAll("details > summary").forEach(x => { if (open.includes(x.textContent.trim())) x.parentElement.open = true; });
+        window.scrollTo(0, y);
+    } catch (e) { /* stil */ }
+}
+setInterval(verversStil, 30000);
+document.addEventListener("toggle", (ev) => {
+    const d = ev.target;
+    if (d.id === "weekschema") S.weekOpen = d.open ? d.dataset.leerling : null;
+}, true);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) verversStil(); });
+
+// Een mislukte opslag is al als melding getoond; geen extra fout in de console.
+window.addEventListener("unhandledrejection", (e) => e.preventDefault());
+
 let bijwerkTimer = null;
 function straksBijwerken() {
     clearTimeout(bijwerkTimer);
@@ -159,9 +194,18 @@ function straksBijwerken() {
 }
 
 async function schrijf(collectie, id, body) {
+    const oud = data[collectie][id];
+    const basis = collectie === "opdrachten" && oud ? (oud.gewijzigd || oud.aangemaakt || "") : undefined;
     data[collectie][id] = { id, ...body };
-    try { await api("opslaan", { collectie, id, body }); }
-    catch (e) { melden(e.message || "Opslaan mislukte.", "fout"); }
+    try {
+        const r = await api("opslaan", { collectie, id, body, basis });
+        if (r.doc && data[collectie][id]) data[collectie][id] = { id, ...r.doc };
+    } catch (e) {
+        if (oud) data[collectie][id] = oud; else delete data[collectie][id];
+        melden(e.message || "Opslaan mislukte.", "fout");
+        straksBijwerken();
+        throw e;
+    }
     straksBijwerken();
 }
 async function wis(collectie, id) {
@@ -305,6 +349,52 @@ function tekenDocentLeerling() {
       </details>`;
     })()}
     ${(() => {
+      // Weekoverzicht: alle vakken van deze leerling in één week, zoals een weekschema.
+      const k = S.docentWeek && S.docentWeek.leerlingId === l.id ? S.docentWeek : { week: NU.week, jaar: NU.jaar };
+      const vorige = vorigeWeek(k.week, k.jaar), volgende = volgendeWeek(k.week, k.jaar);
+      const inWeek = opdrachten.filter(o => o.werkweek === k.week && o.jaar === k.jaar);
+      const vakken = vakkenVanLeerling(l);
+      const rijen = [];
+      for (const v of vakken) {
+        const bij = inWeek.filter(o => o.vakId === v.id);
+        if (bij.length) bij.forEach(o => rijen.push({ vak: v, o })); else rijen.push({ vak: v, o: null });
+      }
+      inWeek.filter(o => !vakken.some(v => v.id === o.vakId)).forEach(o => rijen.push({ vak: { id: "", naam: o.vak || "Overig" }, o }));
+      const isNu = k.week === NU.week && k.jaar === NU.jaar;
+      const klaar = inWeek.filter(o => o.afgerond).length;
+      if (!rijen.length) return "";
+      const open = S.weekOpen === l.id;
+      return `<details class="weekschema" id="weekschema" ${open ? "open" : ""} data-leerling="${l.id}">
+        <summary class="weekschema-knop">
+          <span class="weekschema-knoptekst">Weekoverzicht bekijken</span>
+          <span class="mini">${weeklabel(k.week, k.jaar)} · ${inWeek.length ? `${klaar} van ${inWeek.length} afgerond` : "nog niets klaargezet"}</span>
+        </summary>
+        <div class="weekschema-kop">
+          <h2>${weeklabel(k.week, k.jaar)}${isNu ? ` <em>deze week</em>` : ""}</h2>
+          <span class="mini">${inWeek.length ? `${klaar} van ${inWeek.length} afgerond` : "nog niets klaargezet"}</span>
+          <div class="knoppenrij weekschema-nav">
+            <button class="knop klein rand" data-actie="docent-week" data-id="${l.id}" data-week="${vorige.week}" data-jaar="${vorige.jaar}" aria-label="Vorige week">‹ Week ${vorige.week}</button>
+            ${isNu ? "" : `<button class="knop klein rand" data-actie="docent-week" data-id="${l.id}" data-week="${NU.week}" data-jaar="${NU.jaar}">Deze week</button>`}
+            <button class="knop klein rand" data-actie="docent-week" data-id="${l.id}" data-week="${volgende.week}" data-jaar="${volgende.jaar}" aria-label="Volgende week">Week ${volgende.week} ›</button>
+          </div>
+        </div>
+        <div class="weekschema-lijst">
+          ${rijen.map(({ vak, o }) => o ? `
+          <button class="schemarij ${o.afgerond ? "af" : ""}" data-ga="docent-opdracht" data-id="${o.id}">
+            <span class="schemavak">${esc(vak.naam)}</span>
+            <span class="schemawat">${esc((o.omschrijving || "").trim().split("\n").slice(0, 2).join(" · ") || o.titel)}</span>
+            <span class="merkje ${o.afgerond ? "af" : (o.zichtbaar ? "open" : "dicht")}">${o.afgerond ? "✓ Afgerond" : (o.zichtbaar ? "Zichtbaar" : "Nog dicht")}</span>
+          </button>` : `
+          <div class="schemarij leeg">
+            <span class="schemavak">${esc(vak.naam)}</span>
+            <span class="schemawat">niets klaargezet</span>
+            <button class="knop klein rand" data-actie="nieuw-voor-vak" data-id="${l.id}" data-vak="${vak.id}" data-week="${k.week}" data-jaar="${k.jaar}">+ Klaarzetten</button>
+          </div>`).join("")}
+        </div>
+      </details>
+      <h2 class="pervak">Per vak</h2>`;
+    })()}
+    ${(() => {
       const vakken = vakkenVanLeerling(l);
       const ids = vakken.map(v => v.id);
       const overig = opdrachten.filter(o => !ids.includes(o.vakId));
@@ -346,14 +436,20 @@ function tekenDocentLeerling() {
               const nm = lijst("opmerkingen").filter(m => m.opdrachtId === o.id).length;
               const zojuist = S.zojuist === o.id;
               const kop = o.titel && o.titel !== o.vak && gekozen.id !== "__overig" ? o.titel : "";
-              return `<button class="opdrachtrij ${o.afgerond ? "af" : (o.zichtbaar ? "open" : "dicht")} ${zojuist ? "zojuist" : ""}" data-ga="docent-opdracht" data-id="${o.id}">
+              return `<div class="rijmetactie">
+              <button class="opdrachtrij ${o.afgerond ? "af" : (o.zichtbaar ? "open" : "dicht")} ${zojuist ? "zojuist" : ""}" data-ga="docent-opdracht" data-id="${o.id}">
                 <span class="weekbol ${ditWeek(o) ? "nu" : ""}"><small>week</small>${o.werkweek}</span>
                 <span class="body">
                   <span class="titel" style="display:block">${esc(kop || (gekozen.id === "__overig" ? o.titel : "") || (o.omschrijving || "").split("\n")[0] || "Geen omschrijving")}</span>
                   <span class="meta">${[o.jaar !== NU.jaar ? String(o.jaar) : null, ditWeek(o) ? "deze week" : null, nb ? `${nb} bijlage${nb === 1 ? "" : "n"}` : null, nm ? `${nm} opmerking${nm === 1 ? "" : "en"}` : null, o.afgerond ? `afgerond op ${datumKort(o.afgerondOp)}` : null, o.gekopieerdVan ? "doorgezet" : null].filter(Boolean).join(" · ") || "&nbsp;"}</span>
                 </span>
                 <span class="merkje ${zojuist ? "nieuw" : (o.afgerond ? "af" : (o.zichtbaar ? "open" : "dicht"))}">${zojuist ? "Zojuist klaargezet" : (o.afgerond ? "✓ Afgerond" : (o.zichtbaar ? "Zichtbaar" : "Nog dicht"))}</span>
-              </button>`;
+              </button>
+              <button class="rijweg" data-actie="opdracht-weg" data-id="${o.id}" title="Opdracht verwijderen" aria-label="Opdracht van week ${o.werkweek} verwijderen">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                <span>Verwijderen</span>
+              </button>
+              </div>`;
             }).join("")}
           </div>`}
         </div>`;
@@ -397,10 +493,10 @@ function tekenOpdrachtFormulier() {
         <label>Week<input type="number" name="werkweek" min="1" max="53" required value="${o?.werkweek ?? voorkeur?.week ?? NU.week}"></label>
         ${bewerken ? "" : `<label>Tot en met week <span class="zacht">(mag leeg)</span>
           <input type="number" name="totWeek" min="1" max="53" placeholder="alleen deze week"></label>`}
-        <label>Jaar<input type="number" name="jaar" min="2020" max="2100" required value="${o?.jaar ?? voorkeur?.jaar ?? NU.jaar}"></label>
       </div>
+      <p class="mini" style="margin-top:-.4rem">Deze week is week ${NU.week}. Een weeknummer dat al voorbij is, komt in ${NU.jaar + 1}.</p>
       <label>Wat moet de leerling doen?
-        <textarea name="omschrijving" placeholder="Schrijf in korte, duidelijke stappen op wat de leerling moet doen. Bijvoorbeeld: lees blz. 42 t/m 51, maak daarna opdracht 1 tot en met 4.">${esc(o?.omschrijving || "")}</textarea>
+        <textarea name="omschrijving" required placeholder="Schrijf in korte, duidelijke stappen op wat de leerling moet doen. Bijvoorbeeld: lees blz. 42 t/m 51, maak daarna opdracht 1 tot en met 4.">${esc(o?.omschrijving || "")}</textarea>
       </label>
       <label>Link <span class="zacht">(mag leeg)</span>
         <input type="text" name="link" placeholder="www.voorbeeld.nl/oefenen" value="${esc(o?.link || "")}">
@@ -769,7 +865,8 @@ function tekenAdminScholen() {
           <td><span class="merkje ${s.actief ? "open" : "dicht"}">${s.actief ? "Actief" : "Ingetrokken"}</span></td>
           <td><div class="knoppenrij">
             <button class="knop klein rand" data-actie="school-code" data-id="${s.id}">Nieuwe code</button>
-            <button class="knop klein ${s.actief ? "gevaar" : "rand"}" data-actie="school-wissel" data-id="${s.id}">${s.actief ? "Intrekken" : "Weer activeren"}</button>
+            <button class="knop klein rand" data-actie="school-wissel" data-id="${s.id}">${s.actief ? "Intrekken" : "Weer activeren"}</button>
+            <button class="knop klein gevaar" data-actie="school-weg" data-id="${s.id}">Verwijderen</button>
           </div></td>
         </tr>`).join("") || `<tr><td colspan="6" class="zacht">Nog geen scholen toegevoegd.</td></tr>`}
       </tbody>
@@ -785,7 +882,6 @@ async function laadBeheerders() {
     catch (e) { BEHEER = { ...BEHEER, laden: false, fout: e.message || "De beheerders konden niet worden geladen." }; }
     if (S.scherm === "admin-beheerders") teken();
 }
-
 async function verversBeheerders() {
     BEHEER = { lijst: BEHEER.lijst, mij: BEHEER.mij, laden: false, fout: "" };
     await laadBeheerders();
@@ -887,7 +983,10 @@ function tekenAdminVakken() {
           <td class="tab-nums">${lijst("leerlingen").filter(l => (l.vakken || []).includes(v.id)).length}</td>
           <td class="tab-nums">${lijst("opdrachten").filter(o => o.vakId === v.id).length}</td>
           <td><span class="merkje ${v.actief ? "open" : "dicht"}">${v.actief ? "Actief" : "Uit"}</span></td>
-          <td><button class="knop klein ${v.actief ? "gevaar" : "rand"}" data-actie="vak-wissel" data-id="${v.id}">${v.actief ? "Uitzetten" : "Weer aanzetten"}</button></td>
+          <td><div class="knoppenrij" style="flex-wrap:nowrap">
+            <button class="knop klein rand" data-actie="vak-wissel" data-id="${v.id}">${v.actief ? "Uitzetten" : "Weer aanzetten"}</button>
+            <button class="knop klein gevaar" data-actie="vak-weg" data-id="${v.id}">Verwijderen</button>
+          </div></td>
         </tr>`).join("") || `<tr><td colspan="5" class="zacht">Voor deze school staan nog geen vakken klaar.</td></tr>`}
       </tbody>
     </table></div>
@@ -919,22 +1018,45 @@ function tekenAdminLeerlingen() {
         <div><button class="knop" type="submit">Leerling toevoegen</button></div>
       </form>`}
     </details>
+    ${(() => {
+      const b = S.bewerkLeerling ? vind("leerlingen", S.bewerkLeerling) : null;
+      if (!b) return "";
+      const alleScholen = lijst("scholen").sort((x, y) => x.naam.localeCompare(y.naam));
+      const vakken = lijst("vakken").filter(v => v.schoolId === b.schoolId && (v.actief || (b.vakken || []).includes(v.id))).sort((x, y) => x.naam.localeCompare(y.naam));
+      return `<div class="kaart bewerkkaart" id="leerling-bewerken">
+        <div class="kop" style="margin-bottom:.6rem"><h2 style="margin:0">${esc(b.naam)} bewerken</h2>
+          <button class="knop klein rand" data-actie="leerling-bewerk-stop" type="button">Annuleren</button></div>
+        <form class="formulier" data-form="leerling-bewerk" data-id="${b.id}">
+          <div class="rij">
+            <label>School<select name="schoolId" required>${alleScholen.map(s => `<option value="${s.id}" ${s.id === b.schoolId ? "selected" : ""}>${esc(s.naam)}${s.actief ? "" : " (uit)"}</option>`).join("")}</select></label>
+            <label>Voornaam en eerste letter achternaam<input type="text" name="naam" required maxlength="60" value="${esc(b.naam)}"></label>
+            <label>Klas <span class="zacht">(mag leeg)</span><input type="text" name="klas" maxlength="40" value="${esc(b.klas || "")}" list="klassenlijst"></label>
+          </div>
+          <label>Notitie voor docenten <span class="zacht">(mag leeg)</span>
+            <input type="text" name="notitie" maxlength="200" value="${esc(b.notitie || "")}"></label>
+          <div><label>Vakken</label>
+            ${vakken.length ? `<div class="vakkenkiezer" style="margin-top:.35rem">${vakken.map(v => `<label class="vakvinkje"><input type="checkbox" name="vakken" value="${v.id}" ${(b.vakken || []).includes(v.id) ? "checked" : ""}><span>${esc(v.naam)}</span></label>`).join("")}</div>`
+              : `<p class="mini">Deze school heeft nog geen vakken.</p>`}
+            <p class="mini">Kies je een andere school, dan vervallen de vakken. Vink ze daarna opnieuw aan.</p></div>
+          <div class="knoppenrij"><button class="knop" type="submit">Opslaan</button></div>
+        </form>
+      </div>`;
+    })()}
     <div class="tabel-omhulsel"><table class="tabel">
       <thead><tr><th>Leerling</th><th>School</th><th>Klas</th><th>Koppelcode</th><th>Opdrachten</th><th>Status</th><th></th></tr></thead>
       <tbody>
-        ${leerlingen.map(l => `<tr class="${l.actief ? "" : "uit"}">
+        ${leerlingen.map(l => `<tr class="${l.actief ? "" : "uit"} ${l.id === S.bewerkLeerling ? "bewerkt" : ""}">
           <td><strong>${esc(l.naam)}</strong></td>
           <td>${esc(vind("scholen", l.schoolId)?.naam || "—")}</td>
-          <td><form class="knoppenrij" data-form="leerling-klas" data-id="${l.id}" style="gap:.35rem;flex-wrap:nowrap">
-            <input type="text" name="klas" value="${esc(l.klas || "")}" maxlength="40" placeholder="—" list="klassenlijst" style="width:96px">
-            <button class="knop klein rand" type="submit">Opslaan</button>
-          </form></td>
+          <td>${esc(l.klas || "—")}</td>
           <td><code class="code">${esc(l.koppelcode)}</code></td>
           <td class="tab-nums">${lijst("opdrachten").filter(o => o.leerlingId === l.id).length}</td>
           <td><span class="merkje ${l.actief ? "open" : "dicht"}">${l.actief ? "Actief" : "Ingetrokken"}</span></td>
           <td><div class="knoppenrij">
+            <button class="knop klein" data-actie="leerling-bewerk" data-id="${l.id}">Bewerken</button>
             <button class="knop klein rand" data-actie="leerling-code" data-id="${l.id}">Nieuwe code</button>
-            <button class="knop klein ${l.actief ? "gevaar" : "rand"}" data-actie="leerling-wissel" data-id="${l.id}">${l.actief ? "Intrekken" : "Weer activeren"}</button>
+            <button class="knop klein rand" data-actie="leerling-wissel" data-id="${l.id}">${l.actief ? "Intrekken" : "Weer activeren"}</button>
+            <button class="knop klein gevaar" data-actie="leerling-weg" data-id="${l.id}">Verwijderen</button>
           </div></td>
         </tr>`).join("") || `<tr><td colspan="7" class="zacht">Nog geen leerlingen toegevoegd.</td></tr>`}
       </tbody>
@@ -1035,8 +1157,11 @@ function inhoud() {
 
 function teken() {
     if (!klaar) return;
-    const m = S.melding;
+    // Een melding blijft staan zolang je op hetzelfde scherm blijft (ook als de gegevens op de achtergrond verversen).
+    if (S.melding) S.toonMelding = { ...S.melding, scherm: S.scherm, param: JSON.stringify(S.param), tot: Date.now() + 12000 };
     S.melding = null;
+    const tm = S.toonMelding;
+    const m = tm && tm.scherm === S.scherm && tm.param === JSON.stringify(S.param) && Date.now() < tm.tot ? tm : null;
     el.innerHTML = `
       ${balk()}
       <main class="${S.rol ? "pagina" : ""}">
@@ -1110,6 +1235,17 @@ document.addEventListener("click", (ev) => {
                 .then(() => melden("Nieuwe docentcode aangemaakt. De oude code werkt niet meer."));
             break;
         }
+        case "school-weg": {
+            const s = vind("scholen", id);
+            if (!s) break;
+            const ll = lijst("leerlingen").filter(l => l.schoolId === id);
+            const n = lijst("opdrachten").filter(o => ll.some(l => l.id === o.leerlingId)).length;
+            if (!confirm(`School "${s.naam}" verwijderen?\n\nDaarmee verdwijnen ook ${ll.length} leerling${ll.length === 1 ? "" : "en"}, ${n} opdracht${n === 1 ? "" : "en"} met bijlagen en opmerkingen, en de vakken van deze school. De docentcode en de leerlingcodes werken daarna niet meer. Dit kan niet ongedaan worden gemaakt.\n\nTijdelijk geen toegang geven? Kies dan Intrekken.`)) break;
+            for (const l of ll) { for (const o of lijst("opdrachten").filter(o => o.leerlingId === l.id)) delete data.opdrachten[o.id]; delete data.leerlingen[l.id]; }
+            for (const v of lijst("vakken").filter(v => v.schoolId === id)) delete data.vakken[v.id];
+            wis("scholen", id).then(() => melden(`School "${s.naam}" verwijderd.`));
+            break;
+        }
         case "school-wissel": {
             const s = vind("scholen", id);
             schrijf("scholen", id, { ...zonderId(s), actief: !s.actief }).then(() => melden("Status van de school gewijzigd."));
@@ -1124,11 +1260,27 @@ document.addEventListener("click", (ev) => {
             break;
         }
         case "nieuw-voor-vak":
-            ga("docent-nieuw", { id, vakId: t.dataset.vak, week: NU.week, jaar: NU.jaar });
+            ga("docent-nieuw", { id, vakId: t.dataset.vak, week: Number(t.dataset.week) || NU.week, jaar: Number(t.dataset.jaar) || NU.jaar });
+            break;
+        case "docent-week":
+            S.docentWeek = { leerlingId: id, week: Number(t.dataset.week), jaar: Number(t.dataset.jaar) };
+            S.weekOpen = id;
+            teken();
+            document.getElementById("weekschema")?.scrollIntoView({ block: "nearest" });
             break;
         case "nieuw-in-week":
             ga("docent-nieuw", { id, week: Number(t.dataset.week), jaar: Number(t.dataset.jaar) });
             break;
+        case "vak-weg": {
+            const vak = vind("vakken", id);
+            if (!vak) break;
+            const nl = lijst("leerlingen").filter(l => (l.vakken || []).includes(id)).length;
+            const no = lijst("opdrachten").filter(o => o.vakId === id).length;
+            if (!confirm(`Vak "${vak.naam}" verwijderen?\n\nHet vak verdwijnt bij ${nl} leerling${nl === 1 ? "" : "en"}.${no ? ` De ${no} opdracht${no === 1 ? "" : "en"} van dit vak blijven bewaard en staan daarna onder hun oude vaknaam.` : ""} Dit kan niet ongedaan worden gemaakt.\n\nWil je het vak alleen niet meer laten kiezen? Kies dan Uitzetten.`)) break;
+            for (const l of lijst("leerlingen")) if ((l.vakken || []).includes(id)) l.vakken = l.vakken.filter(x => x !== id);
+            wis("vakken", id).then(() => melden(`Vak "${vak.naam}" verwijderd.`));
+            break;
+        }
         case "vak-wissel": {
             const vak = vind("vakken", id);
             schrijf("vakken", id, { ...zonderId(vak), actief: !vak.actief }).then(() => melden("Status van het vak gewijzigd."));
@@ -1180,6 +1332,21 @@ document.addEventListener("click", (ev) => {
                 .then(() => melden("Nieuwe koppelcode aangemaakt. De oude code werkt niet meer."));
             break;
         }
+        case "leerling-bewerk":
+            S.bewerkLeerling = id; teken();
+            document.getElementById("leerling-bewerken")?.scrollIntoView({ block: "start", behavior: "smooth" });
+            break;
+        case "leerling-bewerk-stop":
+            S.bewerkLeerling = null; teken(); break;
+        case "leerling-weg": {
+            const l = vind("leerlingen", id);
+            if (!l) break;
+            const n = lijst("opdrachten").filter(o => o.leerlingId === id).length;
+            if (!confirm(`Leerling "${l.naam}" verwijderen?\n\nOok ${n === 1 ? "de opdracht" : `alle ${n} opdrachten`} met bijlagen en opmerkingen ${n === 1 ? "wordt" : "worden"} verwijderd en de koppelcode werkt niet meer. Dit kan niet ongedaan worden gemaakt.\n\nTijdelijk geen toegang geven? Kies dan Intrekken.`)) break;
+            for (const o of lijst("opdrachten").filter(o => o.leerlingId === id)) delete data.opdrachten[o.id];
+            wis("leerlingen", id).then(() => melden(`Leerling "${l.naam}" verwijderd.`));
+            break;
+        }
         case "leerling-wissel": {
             const l = vind("leerlingen", id);
             schrijf("leerlingen", id, { ...zonderId(l), actief: !l.actief }).then(() => melden("Status van de leerling gewijzigd."));
@@ -1192,15 +1359,31 @@ const zonderId = (o) => { const k = { ...o }; delete k.id; return k; };
 
 /** Zoekt een vak op naam binnen de school (hoofdletters maken niet uit); bestaat het niet, dan wordt het aangemaakt.
     Een uitgezet vak met dezelfde naam wordt weer aangezet in plaats van dubbel aangemaakt. */
+function vakSleutel(t) {
+    let a = 0x811c9dc5, b = 0x01000193;
+    for (const ch of t) { a = Math.imul(a ^ ch.codePointAt(0), 16777619) >>> 0; b = Math.imul(b + ch.codePointAt(0), 2246822507) >>> 0; }
+    return a.toString(16).padStart(8, "0") + b.toString(16).padStart(8, "0");
+}
+
+/** Wijzigt alleen wat deze gebruiker aan de vakken verandert, zodat gelijktijdige wijzigingen van collega's blijven staan. */
+async function vakkenWijzigen(l, erbij, eraf) {
+    erbij = erbij.filter(Boolean); eraf = eraf.filter(Boolean);
+    if (!erbij.length && !eraf.length) return;
+    const nieuw = [...new Set([...(l.vakken || []).filter(x => !eraf.includes(x)), ...erbij])];
+    await schrijf("leerlingen", l.id, { ...zonderId(l), vakken: nieuw, vakkenErbij: erbij, vakkenEraf: eraf });
+}
+
 async function vakZoekOfMaak(schoolId, naam) {
     naam = String(naam || "").trim().replace(/\s+/g, " ");
     if (!naam) return null;
+    if (naam === naam.toLowerCase()) naam = naam.charAt(0).toUpperCase() + naam.slice(1);
     const bestaand = lijst("vakken").find(v => v.schoolId === schoolId && v.naam.toLowerCase() === naam.toLowerCase());
     if (bestaand) {
         if (!bestaand.actief) await schrijf("vakken", bestaand.id, { ...zonderId(bestaand), actief: true });
         return vind("vakken", bestaand.id);
     }
-    const id = nieuwId();
+    // Vaste id op basis van school + naam: voegen twee docenten tegelijk "CKV" toe, dan wordt het één vak.
+    const id = "v" + vakSleutel(schoolId + "|" + naam.toLowerCase());
     await schrijf("vakken", id, { schoolId, naam, actief: true, toegevoegdDoor: S.rol === "docent" ? "docent" : "beheer", aangemaakt: new Date().toISOString() });
     return vind("vakken", id);
 }
@@ -1239,7 +1422,9 @@ document.addEventListener("submit", async (ev) => {
                 const vak = await vakZoekOfMaak(l.schoolId, naam);
                 if (vak && !gekozen.includes(vak.id)) gekozen.push(vak.id);
             }
-            await schrijf("leerlingen", l.id, { ...zonderId(vind("leerlingen", l.id)), vakken: gekozen });
+            const voorheen = vind("leerlingen", l.id).vakken || [];
+            await vakkenWijzigen(vind("leerlingen", l.id), gekozen.filter(x => !voorheen.includes(x)),
+                [...f.querySelectorAll('input[name="vakken"]:not(:checked)')].map(i => i.value).filter(x => voorheen.includes(x)));
             if (extra.length) return melden(`${extra.length === 1 ? "Vak" : "Vakken"} toegevoegd en aangevinkt voor ${l.naam}.`);
             melden(gekozen.length === 0
                 ? `Er staan nu geen vakken aangevinkt voor ${l.naam}.`
@@ -1269,13 +1454,14 @@ document.addEventListener("submit", async (ev) => {
             const id = bestaand ? bestaand.id : nieuwId();
             let link = String(v.link || "").trim();
             if (link && !/^https?:\/\//i.test(link)) link = "https://" + link;
+            if (!String(v.omschrijving || "").trim()) return melden("Schrijf op wat de leerling moet doen.", "fout");
             let leerling = vind("leerlingen", f.dataset.leerling);
             let vak = v.vakId && v.vakId !== "__nieuw" ? vind("vakken", v.vakId) : null;
             if (v.vakId === "__nieuw") {
                 if (!String(v.nieuwVak || "").trim()) return melden("Vul de naam van het nieuwe vak in, of kies een ander vak.", "fout");
                 vak = await vakZoekOfMaak(leerling.schoolId, v.nieuwVak);
                 if (!(leerling.vakken || []).includes(vak.id)) {
-                    await schrijf("leerlingen", leerling.id, { ...zonderId(leerling), vakken: [...(leerling.vakken || []), vak.id] });
+                    await vakkenWijzigen(leerling, [vak.id], []);
                     leerling = vind("leerlingen", leerling.id);
                 }
             }
@@ -1290,7 +1476,7 @@ document.addEventListener("submit", async (ev) => {
                 omschrijving: String(v.omschrijving || ""),
                 link: link || "",
                 werkweek: Number(v.werkweek) || NU.week,
-                jaar: Number(v.jaar) || NU.jaar,
+                jaar: (bestaand && Number(v.werkweek) === bestaand.werkweek) ? bestaand.jaar : jaarVoorWeek(Number(v.werkweek) || NU.week),
                 zichtbaar: !!v.zichtbaar,
                 afgerond: bestaand ? !!bestaand.afgerond : false,
                 afgerondOp: bestaand ? (bestaand.afgerondOp || "") : "",
@@ -1319,7 +1505,7 @@ document.addEventListener("submit", async (ev) => {
                     tekst: `"${body.titel}" staat klaar ` + (reeks.length === 1
                         ? `in ${weeklabel(body.werkweek, body.jaar)}`
                         : `in ${reeks.length} weken: week ${body.werkweek} t/m week ${laatste.week} (${laatste.jaar})`)
-                        + ` voor ${leerling.naam}. ` + melding,
+                        + ` voor ${leerling.naam.replace(/\.$/, "")}. ` + melding,
                     soort: "ok",
                 };
                 ga("docent-leerling", leerling.id, "vakdetail");
@@ -1374,6 +1560,24 @@ document.addEventListener("submit", async (ev) => {
             melden(dubbel
                 ? `Leerling toegevoegd. Let op: er is op deze school nog een "${dubbel}" in een andere klas. Kijk bij het klaarzetten van werk goed naar de klas.`
                 : "Leerling toegevoegd. De koppelcode staat in de lijst.");
+            break;
+        }
+        case "leerling-bewerk": {
+            const l = vind("leerlingen", f.dataset.id);
+            if (!l) break;
+            const naam = String(v.naam || "").trim().replace(/\s+/g, " ");
+            const klas = String(v.klas || "").trim();
+            if (!naam) return melden("Vul de naam in.", "fout");
+            const dubbel = lijst("leerlingen").some(x => x.id !== l.id && x.schoolId === v.schoolId
+                && x.naam.trim().toLowerCase() === naam.toLowerCase() && String(x.klas || "").trim().toLowerCase() === klas.toLowerCase());
+            if (dubbel) return melden(`Bij deze school staat al een leerling "${naam}"${klas ? " in dezelfde klas" : ""}. Voeg een extra letter van de achternaam toe.`, "fout");
+            const andereSchool = v.schoolId !== l.schoolId;
+            const vakken = andereSchool ? [] : [...f.querySelectorAll('input[name="vakken"]:checked')].map(i => i.value);
+            S.bewerkLeerling = null;
+            await schrijf("leerlingen", l.id, { ...zonderId(l), schoolId: v.schoolId, naam, klas, notitie: String(v.notitie || "").trim(), vakken });
+            melden(andereSchool
+                ? `Gegevens van ${naam} opgeslagen. De opdrachten zijn mee verhuisd. Let op: de vakken zijn leeg omdat de school is veranderd, die kun je hier of de docent opnieuw aanvinken.`
+                : `Gegevens van ${naam} opgeslagen.`);
             break;
         }
         case "leerling-klas": {
@@ -1439,12 +1643,15 @@ async function kopieerOpdrachten(ids) {
 
 async function verwijderOpdracht(id) {
     const o = vind("opdrachten", id);
-    if (!o || !confirm("Deze opdracht en alle bijlagen definitief verwijderen?")) return;
+    if (!o) return;
+    const wat = `${o.vak || o.titel || "Opdracht"}, week ${o.werkweek}`;
+    if (!confirm(`Opdracht "${wat}" verwijderen?\n\nDe leerling ziet hem daarna niet meer. Bijlagen en opmerkingen worden ook verwijderd. Dit kan niet ongedaan worden gemaakt.`)) return;
     const leerlingId = o.leerlingId;
     for (const b of lijst("bijlagen").filter(x => x.opdrachtId === id)) await wis("bijlagen", b.id);
     for (const m of lijst("opmerkingen").filter(x => x.opdrachtId === id)) await wis("opmerkingen", m.id);
     await wis("opdrachten", id);
-    S.melding = { tekst: "Opdracht verwijderd.", soort: "ok" };
+    S.melding = { tekst: `Opdracht "${wat}" verwijderd.`, soort: "ok" };
+    if (S.rol === "docent" && o.vakId) S.gekozenVak = { leerlingId, vakId: o.vakId };
     ga(S.rol === "admin" ? "admin-opdrachten" : "docent-leerling", S.rol === "admin" ? null : leerlingId);
 }
 

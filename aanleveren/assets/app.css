@@ -301,6 +301,11 @@ div:has(> .vakkenkiezer input[value="__nieuw"]:checked) > .nieuwvak { display: g
 .opdrachtrij .titel { font-weight: 600; color: var(--teal-900); }
 .opdrachtrij .meta { font-size: .81rem; color: var(--grijs-700); margin-top: .1rem; }
 .opdrachtrij.stil { cursor: default; }
+.rijmetactie { display: flex; align-items: stretch; gap: .5rem; }
+.rijmetactie .opdrachtrij { flex: 1; min-width: 0; }
+.rijweg { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem; width: 74px; font: inherit; font-size: .7rem; font-weight: 600; cursor: pointer; background: var(--wit); color: var(--grijs-700); border: 1px solid var(--grijs-200); border-radius: var(--radius); }
+.rijweg:hover, .rijweg:focus-visible { color: #a8302a; border-color: #e3b1ad; background: #fdf3f2; }
+@media (max-width: 520px) { .rijweg { width: 48px; } .rijweg span { display: none; } }
 
 .merkje { display: inline-block; font-size: .71rem; font-weight: 600; padding: .18rem .5rem; border-radius: 999px; background: var(--grijs-100); color: var(--grijs-700); white-space: nowrap; }
 .merkje.open { background: var(--groen-050); color: var(--groen-600); }
@@ -360,3 +365,35 @@ details.uitklap[open] summary { margin-bottom: .9rem; }
     h1 { font-size: 1.5rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.bewerkkaart { margin: 1rem 0; border-color: var(--teal-300); scroll-margin-top: 1rem; }
+.tabel tr.bewerkt td { background: var(--teal-050); }
+
+/* weekoverzicht docent */
+.weekschema { background: var(--wit); border: 1px solid var(--grijs-200); border-radius: var(--radius); margin: 1.2rem 0 1.6rem; overflow: hidden; scroll-margin-top: 1rem; }
+.weekschema-kop { display: flex; align-items: center; gap: .4rem 1rem; flex-wrap: wrap; padding: .9rem 1.1rem; background: var(--teal-050); border-bottom: 1px solid var(--grijs-200); }
+.weekschema-kop h2 { margin: 0; font-size: 1.15rem; }
+.weekschema-kop h2 em { font-style: normal; font-size: .8rem; font-weight: 600; color: var(--groen-600); margin-left: .3rem; }
+.weekschema-nav { margin-left: auto; }
+.schemarij { display: grid; grid-template-columns: 9rem 1fr auto; gap: .9rem; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--inkt); background: none; border: 0; border-bottom: 1px solid var(--grijs-100); padding: .7rem 1.1rem; cursor: pointer; }
+.schemarij:last-child { border-bottom: 0; }
+button.schemarij:hover { background: var(--grijs-100); }
+.schemavak { font-weight: 600; color: var(--teal-900); overflow-wrap: anywhere; }
+.schemawat { font-size: .9rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.schemarij.af .schemawat { color: var(--grijs-500); }
+.schemarij.leeg { cursor: default; }
+.schemarij.leeg .schemawat { color: var(--oker); font-style: italic; }
+.pervak { margin: 0 0 .2rem; font-size: 1.1rem; }
+@media (max-width: 620px) {
+  .schemarij { grid-template-columns: 1fr auto; }
+  .schemarij .schemawat { grid-column: 1 / -1; grid-row: 2; white-space: normal; }
+  .weekschema-nav { margin-left: 0; }
+}
+
+.weekschema-knop { display: flex; align-items: center; gap: .4rem 1rem; flex-wrap: wrap; padding: .85rem 1.1rem; cursor: pointer; list-style: none; }
+.weekschema-knop::-webkit-details-marker { display: none; }
+.weekschema-knop::before { content: "▸"; color: var(--teal-700); transition: transform .15s; }
+.weekschema[open] > .weekschema-knop::before { transform: rotate(90deg); }
+.weekschema-knoptekst { font-family: var(--display); font-weight: 700; color: var(--teal-900); }
+.weekschema[open] > .weekschema-knop { border-bottom: 1px solid var(--grijs-200); }
+.weekschema-knop:focus-visible { outline: 2px solid var(--teal-500); outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) { .weekschema-knop::before { transition: none; } }
